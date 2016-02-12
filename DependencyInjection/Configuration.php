@@ -18,11 +18,38 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('click_and_mortar_import');
-
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode    = $treeBuilder->root('click_and_mortar_import');
+        $rootNode
+            ->children()
+                ->arrayNode('entities')
+                    ->useAttributeAsKey('name')
+                    ->requiresAtLeastOneElement()
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('model')
+                                ->info('Complete entity class name (eg. Acme\DemoBundle\Entity\Customer)')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('repository')
+                                ->info('Repository for current entity (eg. AcmeDemoBundle:Customer)')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('unique_key')
+                                ->info('Field to check entity in database and update only')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->arrayNode('mappings')
+                                ->requiresAtLeastOneElement()
+                                ->prototype('scalar')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

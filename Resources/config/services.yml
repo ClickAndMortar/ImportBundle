@@ -1,1 +1,6 @@
+parameters:
+  clickandmortar.reader.csv_reader.class: ClickAndMortar\ImportBundle\Reader\CsvReader
+
 services:
+  clickandmortar.reader.csv_reader:
+    class: %clickandmortar.reader.csv_reader.class%
