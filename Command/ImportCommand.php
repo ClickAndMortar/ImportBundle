@@ -137,7 +137,7 @@ class ImportCommand extends ContainerAwareCommand
             );
             $entity   = $repository->findOneBy($criteria);
             if (is_null($entity)) {
-                $entity = new $entityClassname;
+                $entity = new $entityClassname();
             }
 
             // Set fields
