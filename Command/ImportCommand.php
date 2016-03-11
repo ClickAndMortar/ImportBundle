@@ -122,10 +122,15 @@ class ImportCommand extends ContainerAwareCommand
         $uniqueKey       = $entityConfiguration['unique_key'];
         $mapping         = $entityConfiguration['mappings'];
         $entityClassname = $entityConfiguration['model'];
-        $rows            = $this->reader->read($path);
-        $size            = count($rows);
-        $index           = 1;
-        $progress        = new ProgressBar($output, $size);
+        if (isset($entityConfiguration['complete_mapping_method'])) {
+            $completeMethodName = $entityConfiguration['complete_mapping_method'];
+        } else {
+            $completeMethodName = null;
+        }
+        $rows     = $this->reader->read($path);
+        $size     = count($rows);
+        $index    = 1;
+        $progress = new ProgressBar($output, $size);
         $progress->start();
 
         // Create each entity
@@ -145,6 +150,11 @@ class ImportCommand extends ContainerAwareCommand
                     ucfirst($entityPropertyKey)
                 );
                 $entity->{$setter}($row[$filePropertyKey]);
+            }
+
+            // Complete data if necessary
+            if (!is_null($completeMethodName)) {
+                $entity->{$completeMethodName}($row);
             }
             $entityManager->persist($entity);
 
