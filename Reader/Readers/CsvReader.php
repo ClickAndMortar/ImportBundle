@@ -1,7 +1,8 @@
 <?php
 
-namespace ClickAndMortar\ImportBundle\Reader;
+namespace ClickAndMortar\ImportBundle\Reader\Readers;
 
+use ClickAndMortar\ImportBundle\Reader\AbstractReader;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -50,5 +51,17 @@ class CsvReader extends AbstractReader
         fclose($handle);
 
         return $data;
+    }
+
+    /**
+     * Support only csv type
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function support($type)
+    {
+        return $type == 'csv';
     }
 }

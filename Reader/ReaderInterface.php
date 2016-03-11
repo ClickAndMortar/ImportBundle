@@ -17,4 +17,13 @@ interface ReaderInterface
      * @return array mixed
      */
     public function read($path);
+
+    /**
+     * Check if reader support $type
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function support($type);
 }

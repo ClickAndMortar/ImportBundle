@@ -2,7 +2,7 @@
 
 namespace ClickAndMortar\ImportBundle\Command;
 
-use ClickAndMortar\ImportBundle\Reader\ReaderInterface;
+use ClickAndMortar\ImportBundle\Reader\AbstractReader;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -27,9 +27,9 @@ class ImportCommand extends ContainerAwareCommand
     const CHUNK_SIZE = 30;
 
     /**
-     * @var ReaderInterface
+     * @var AbstractReader
      */
-    protected $readerService;
+    protected $reader;
 
     /**
      * Configure command
@@ -62,15 +62,13 @@ class ImportCommand extends ContainerAwareCommand
         $container = $this->getContainer();
         $path      = $input->getArgument('path');
         if (file_exists($path) && is_readable($path)) {
-            // Check for existing reader
-            $fileExtension     = pathinfo($path, PATHINFO_EXTENSION);
-            $readerServiceName = sprintf(
-                'clickandmortar.reader.%s_reader',
-                strtolower($fileExtension)
-            );
+            // Get reader by extension
+            $fileExtension          = pathinfo($path, PATHINFO_EXTENSION);
+            $fileExtensionFormatted = strtolower($fileExtension);
+            $readerDispatcher       = $container->get('clickandmortar.import_bundle.reader_dispatcher');
 
-            if ($container->has($readerServiceName)) {
-                $this->readerService = $container->get($readerServiceName);
+            if ($readerDispatcher->hasReaderByType($fileExtensionFormatted)) {
+                $this->reader = $readerDispatcher->getReaderByType($fileExtensionFormatted);
             } else {
                 $errorMessage = sprintf(
                     'No reader exist for extension %s to read file %s',
@@ -124,7 +122,7 @@ class ImportCommand extends ContainerAwareCommand
         $uniqueKey       = $entityConfiguration['unique_key'];
         $mapping         = $entityConfiguration['mappings'];
         $entityClassname = $entityConfiguration['model'];
-        $rows            = $this->readerService->read($path);
+        $rows            = $this->reader->read($path);
         $size            = count($rows);
         $index           = 1;
         $progress        = new ProgressBar($output, $size);

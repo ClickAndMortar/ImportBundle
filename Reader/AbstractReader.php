@@ -5,7 +5,7 @@ namespace ClickAndMortar\ImportBundle\Reader;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Interface ReaderInterface
+ * Class AbstractReader
  *
  * @package ClickAndMortar\ImportBundle\Reader
  */
