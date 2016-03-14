@@ -1,6 +1,6 @@
 <?php
 
-namespace ClickAndMortar\ImportBundle\Service;
+namespace ClickAndMortar\ImportBundle\ImportHelper;
 
 /**
  * Interface ImportHelperInterface
