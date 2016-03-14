@@ -117,16 +117,15 @@ class ImportCommand extends ContainerAwareCommand
         $entityConfiguration = $entities[$entity];
 
         /** @var EntityManager $entityManager */
-        $entityManager   = $container->get('doctrine')->getManager();
-        $repository      = $entityManager->getRepository($entityConfiguration['repository']);
-        $uniqueKey       = $entityConfiguration['unique_key'];
-        $mapping         = $entityConfiguration['mappings'];
-        $entityClassname = $entityConfiguration['model'];
-        if (isset($entityConfiguration['complete_mapping_method'])) {
-            $completeMethodName = $entityConfiguration['complete_mapping_method'];
-        } else {
-            $completeMethodName = null;
-        }
+        $entityManager      = $container->get('doctrine')->getManager();
+        $repository         = $entityManager->getRepository($entityConfiguration['repository']);
+        $uniqueKey          = $entityConfiguration['unique_key'];
+        $mapping            = $entityConfiguration['mappings'];
+        $entityClassname    = $entityConfiguration['model'];
+        $completeMethodName = isset($entityConfiguration['complete_mapping_method']) ? $entityConfiguration['complete_mapping_method'] : null;
+        $onlyUpdate         = $entityConfiguration['only_update'];
+
+        // Read file
         $rows     = $this->reader->read($path);
         $size     = count($rows);
         $index    = 1;
@@ -139,24 +138,26 @@ class ImportCommand extends ContainerAwareCommand
                 $uniqueKey => $row[$mapping[$uniqueKey]],
             );
             $entity   = $repository->findOneBy($criteria);
-            if (is_null($entity)) {
+            if (is_null($entity) && $onlyUpdate === false) {
                 $entity = new $entityClassname();
             }
 
-            // Set fields
-            foreach ($mapping as $entityPropertyKey => $filePropertyKey) {
-                $setter = sprintf(
-                    'set%s',
-                    ucfirst($entityPropertyKey)
-                );
-                $entity->{$setter}($row[$filePropertyKey]);
-            }
+            if (!is_null($entity)) {
+                // Set fields
+                foreach ($mapping as $entityPropertyKey => $filePropertyKey) {
+                    $setter = sprintf(
+                        'set%s',
+                        ucfirst($entityPropertyKey)
+                    );
+                    $entity->{$setter}($row[$filePropertyKey]);
+                }
 
-            // Complete data if necessary
-            if (!is_null($completeMethodName)) {
-                $entity->{$completeMethodName}($row);
+                // Complete data if necessary
+                if (!is_null($completeMethodName)) {
+                    $entity->{$completeMethodName}($row);
+                }
+                $entityManager->persist($entity);
             }
-            $entityManager->persist($entity);
 
             // Persist if necessary
             if (($index % self::CHUNK_SIZE) === 0) {
@@ -166,7 +167,6 @@ class ImportCommand extends ContainerAwareCommand
             }
             $index++;
         }
-
         $entityManager->flush();
         $entityManager->clear();
         $progress->finish();
