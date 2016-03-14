@@ -3,6 +3,7 @@
 namespace ClickAndMortar\ImportBundle\Command;
 
 use ClickAndMortar\ImportBundle\Reader\AbstractReader;
+use ClickAndMortar\ImportBundle\Service\ImportHelperInterface;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -29,7 +30,14 @@ class ImportCommand extends ContainerAwareCommand
     /**
      * @var AbstractReader
      */
-    protected $reader;
+    protected $reader = null;
+
+    /**
+     * Import helper
+     *
+     * @var ImportHelperInterface
+     */
+    protected $importHelper = null;
 
     /**
      * Configure command
@@ -98,6 +106,21 @@ class ImportCommand extends ContainerAwareCommand
 
             throw new InvalidArgumentException($errorMessage);
         }
+
+        // Check for import helper if necessary
+        $importHelperService = isset($entities[$entity]['import_helper_service']) ? $entities[$entity]['import_helper_service'] : null;
+        if (!is_null($importHelperService)) {
+            if ($container->has($importHelperService)) {
+                $this->importHelper = $container->get($importHelperService);
+            } else {
+                $errorMessage = sprintf(
+                    '%s import helper does not exist',
+                    $entity
+                );
+
+                throw new InvalidArgumentException($errorMessage);
+            }
+        }
     }
 
     /**
@@ -117,13 +140,12 @@ class ImportCommand extends ContainerAwareCommand
         $entityConfiguration = $entities[$entity];
 
         /** @var EntityManager $entityManager */
-        $entityManager      = $container->get('doctrine')->getManager();
-        $repository         = $entityManager->getRepository($entityConfiguration['repository']);
-        $uniqueKey          = $entityConfiguration['unique_key'];
-        $mapping            = $entityConfiguration['mappings'];
-        $entityClassname    = $entityConfiguration['model'];
-        $completeMethodName = isset($entityConfiguration['complete_mapping_method']) ? $entityConfiguration['complete_mapping_method'] : null;
-        $onlyUpdate         = $entityConfiguration['only_update'];
+        $entityManager   = $container->get('doctrine')->getManager();
+        $repository      = $entityManager->getRepository($entityConfiguration['repository']);
+        $uniqueKey       = $entityConfiguration['unique_key'];
+        $mapping         = $entityConfiguration['mappings'];
+        $entityClassname = $entityConfiguration['model'];
+        $onlyUpdate      = $entityConfiguration['only_update'];
 
         // Read file
         $rows     = $this->reader->read($path);
@@ -153,8 +175,8 @@ class ImportCommand extends ContainerAwareCommand
                 }
 
                 // Complete data if necessary
-                if (!is_null($completeMethodName)) {
-                    $entity->{$completeMethodName}($row);
+                if (!is_null($this->importHelper)) {
+                    $this->importHelper->completeData($entity, $row);
                 }
                 $entityManager->persist($entity);
             }
