@@ -6,27 +6,21 @@ Import Bundle can be used to populate entities from flat files (.csv, .xml, etc.
 1. Installation
 ----------------------
 
-Add package and repository in your **composer.json** file:
+Add package your **`composer.json`** file:
 ```javascript
 "require": {
     ...
     "clickandmortar/import-bundle": "^1.0"
     ...
-},
-"repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:ClickAndMortar/importbundle.git"
-        }
-    ],
+}
 ```
 
-Launch composer update to add bundle to your project:
+Launch `composer update` to add bundle to your project:
 ```bash
-composer update
+composer update clickandmortar/import-bundle
 ```
 
-Add bundle in your **app/AppKernel.php** file:
+Add bundle in your **`app/AppKernel.php`** file:
 ```php
 $bundles = array(
             ...
