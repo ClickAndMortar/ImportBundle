@@ -2,8 +2,8 @@
 
 namespace ClickAndMortar\ImportBundle\Command;
 
+use ClickAndMortar\ImportBundle\ImportHelper\ImportHelperInterface;
 use ClickAndMortar\ImportBundle\Reader\AbstractReader;
-use ClickAndMortar\ImportBundle\Service\ImportHelperInterface;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -138,6 +138,7 @@ class ImportCommand extends ContainerAwareCommand
         $path                = $input->getArgument('path');
         $entity              = $input->getArgument('entity');
         $entityConfiguration = $entities[$entity];
+        $errors              = array();
 
         /** @var EntityManager $entityManager */
         $entityManager   = $container->get('doctrine')->getManager();
@@ -176,7 +177,7 @@ class ImportCommand extends ContainerAwareCommand
 
                 // Complete data if necessary
                 if (!is_null($this->importHelper)) {
-                    $this->importHelper->completeData($entity, $row);
+                    $this->importHelper->completeData($entity, $row, $errors);
                 }
                 $entityManager->persist($entity);
             }
@@ -195,6 +196,11 @@ class ImportCommand extends ContainerAwareCommand
 
         if ($input->getOption('delete-after-import') == true) {
             unlink($path);
+        }
+
+        // Print errors if necessary
+        foreach ($errors as $error) {
+            $output->writeln(sprintf('<error>%s</error>', $error));
         }
     }
 }

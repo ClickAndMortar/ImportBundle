@@ -14,8 +14,9 @@ interface ImportHelperInterface
      *
      * @param mixed $entity
      * @param array $data
+     * @param array $errors
      *
      * @return void
      */
-    public function completeData(&$entity, array $data);
+    public function completeData(&$entity, array $data, array &$errors);
 }
