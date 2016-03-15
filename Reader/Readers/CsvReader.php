@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class CsvReader
  *
- * @package ClickAndMortar\ImportBundle\Reader
+ * @package ClickAndMortar\ImportBundle\Reader\Readers
  */
 class CsvReader extends AbstractReader
 {
