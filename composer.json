@@ -1,5 +1,5 @@
 {
-    "name": "clickandmortar/import-bundle",
+    "name": "2lenet/import-bundle",
     "description": "Import data from files (.csv, .xml, ...)",
     "type": "symfony-bundle",
     "license": "MIT",
