@@ -2,7 +2,7 @@
 
 namespace ClickAndMortar\ImportBundle;
 
-use ClickAndMortar\ImportBundle\CompilerPass\ReaderDispatcherCompilerPass;
+use ClickAndMortar\ImportBundle\DependencyInjection\ClickAndMortarImportExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -13,6 +13,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class ClickAndMortarImportBundle extends Bundle
 {
+
+    public function getContainerExtension()
+    {
+        return new ClickAndMortarImportExtension();
+    }
+
     /**
      * Build.
      *
@@ -20,8 +26,7 @@ class ClickAndMortarImportBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
+        //$container->registerExtension(new ClickAndMortarImportExtension());
         parent::build($container);
-
-        $container->addCompilerPass(new ReaderDispatcherCompilerPass());
     }
 }

@@ -39,12 +39,13 @@ class ImportCommand extends ContainerAwareCommand
      */
     protected $importHelper = null;
 
+
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('candm:import')
+        $this->setName('app:import')
              ->setDescription('Import file to create entities')
              ->addArgument('path', InputArgument::REQUIRED, 'File path (eg. "/home/user/my-data.csv")')
              ->addArgument(

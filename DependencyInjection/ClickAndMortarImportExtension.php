@@ -24,8 +24,7 @@ class ClickAndMortarImportExtension extends Extension
 
         // Set parameters from configuration
         $container->setParameter('entities', $processedConfiguration['entities']);
-
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $loader->load('services.yaml');
     }
 }

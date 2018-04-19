@@ -1,0 +1,19 @@
+
+parameters:
+  clickandmortar.import_bundle.reader.csv_reader.class: ClickAndMortar\ImportBundle\Reader\Readers\CsvReader
+
+services:
+
+  _defaults:
+    autowire: true
+    public: true
+    autoconfigure: true
+          
+  ClickAndMortar\ImportBundle\Command\:
+    resource: '../../Command'
+  # Readers
+
+  clickandmortar.import_bundle.reader.csv_reader:
+    class: '%clickandmortar.import_bundle.reader.csv_reader.class%'
+    tags:
+      - { name: clickandmortar.import.reader }

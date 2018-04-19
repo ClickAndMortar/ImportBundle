@@ -7,13 +7,16 @@
         {
             "name": "Simon CARRE",
             "email": "simon.carre@clickandmortar.fr"
+        },
+        {
+            "name": "Sébastien HEITZMANN",
+            "email": "2le@2le.net"
         }
     ],
     "require": {
     },
     "autoload": {
-        "psr-4": {
-            "ClickAndMortar\\ImportBundle\\": ""
-        }
-    }
+        "psr-0": { "ClickAndMortar\\ImportBundle": "" }
+    },
+    "target-dir": "ClickAndMortar/ImportBundle"
 }
