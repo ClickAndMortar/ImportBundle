@@ -5,7 +5,6 @@ namespace ClickAndMortar\ImportBundle\ImportHelper;
 /**
  * Interface ImportHelperInterface
  *
- * @package ClickAndMortar\ImportBundle\Service
  */
 interface ImportHelperInterface
 {

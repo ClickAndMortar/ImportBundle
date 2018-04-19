@@ -4,6 +4,8 @@ namespace ClickAndMortar\ImportBundle\Command;
 
 use ClickAndMortar\ImportBundle\ImportHelper\ImportHelperInterface;
 use ClickAndMortar\ImportBundle\Reader\AbstractReader;
+use ClickAndMortar\ImportBundle\Reader\Readers\CsvReader;
+
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -39,7 +41,11 @@ class ImportCommand extends ContainerAwareCommand
      */
     protected $importHelper = null;
 
-
+    public function __construct(CsvReader $reader)
+    {
+      $this->reader = $reader;
+      parent::__construct();
+    }
     /**
      * Configure command
      */
@@ -74,19 +80,7 @@ class ImportCommand extends ContainerAwareCommand
             // Get reader by extension
             $fileExtension          = pathinfo($path, PATHINFO_EXTENSION);
             $fileExtensionFormatted = strtolower($fileExtension);
-            $readerDispatcher       = $container->get('clickandmortar.import_bundle.reader_dispatcher');
 
-            if ($readerDispatcher->hasReaderByType($fileExtensionFormatted)) {
-                $this->reader = $readerDispatcher->getReaderByType($fileExtensionFormatted);
-            } else {
-                $errorMessage = sprintf(
-                    'No reader exist for extension %s to read file %s',
-                    $fileExtension,
-                    $path
-                );
-
-                throw new InvalidArgumentException($errorMessage);
-            }
         } else {
             $errorMessage = sprintf(
                 'File %s does not exist',
