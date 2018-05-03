@@ -152,10 +152,14 @@ class ImportCommand extends ContainerAwareCommand
 
         // Create each entity
         foreach ($rows as $row) {
-            $criteria = array(
-                $uniqueKey => $row[$mapping[$uniqueKey]],
-            );
-            $entity   = $repository->findOneBy($criteria);
+            if ($uniqueKey) {
+                $criteria = array(
+                    $uniqueKey => $row[$mapping[$uniqueKey]],
+                );
+                $entity   = $repository->findOneBy($criteria);
+            } else {
+                $entity = null;
+            }
             if (is_null($entity) && $onlyUpdate === false) {
                 $entity = new $entityClassname();
             }
