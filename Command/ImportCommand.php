@@ -138,7 +138,7 @@ class ImportCommand extends ContainerAwareCommand
         /** @var EntityManager $entityManager */
         $entityManager   = $container->get('doctrine')->getManager();
         $repository      = $entityManager->getRepository($entityConfiguration['repository']);
-        $uniqueKey       = $entityConfiguration['unique_key'];
+        $uniqueKey       = isset($entityConfiguration['unique_key']) ? $entityConfiguration['unique_key']: null;
         $mapping         = $entityConfiguration['mappings'];
         $entityClassname = $entityConfiguration['model'];
         $onlyUpdate      = $entityConfiguration['only_update'];
