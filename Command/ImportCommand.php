@@ -154,7 +154,7 @@ class ImportCommand extends ContainerAwareCommand
         foreach ($rows as $row) {
             if ($uniqueKey) {
                 $criteria = array(
-                    $uniqueKey => $row[$mapping[$uniqueKey]],
+                    $uniqueKey => trim($row[$mapping[$uniqueKey]]),
                 );
                 $entity   = $repository->findOneBy($criteria);
             } else {
@@ -171,7 +171,7 @@ class ImportCommand extends ContainerAwareCommand
                         'set%s',
                         ucfirst($entityPropertyKey)
                     );
-                    $entity->{$setter}($row[$filePropertyKey]);
+                    $entity->{$setter}(trim($row[$filePropertyKey]));
                 }
 
                 // Complete data if necessary
