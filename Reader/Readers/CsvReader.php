@@ -23,7 +23,7 @@ class CsvReader extends AbstractReader
 
         $resolver->setDefaults(
             array(
-                'delimiter' => ';',
+                'delimiter' => ',',
             )
         );
     }

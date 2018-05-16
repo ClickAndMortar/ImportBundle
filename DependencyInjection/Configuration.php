@@ -38,8 +38,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('unique_key')
                                 ->info('Field to check entity in database and update only')
-                                ->isRequired()
-                                ->cannotBeEmpty()
                             ->end()
                             ->scalarNode('import_helper_service')
                                 ->info('Service that implements the interface ImportHelperInterface to complete data after classic mapping import')

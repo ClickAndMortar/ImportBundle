@@ -1,0 +1,12 @@
+services:
+
+  _defaults:
+    autowire: true
+    public: true
+    autoconfigure: true
+
+  ClickAndMortar\ImportBundle\Command\:
+    resource: '../../Command'
+
+  ClickAndMortar\ImportBundle\Reader\Readers\:
+    resource: '../../Reader/Readers'

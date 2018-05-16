@@ -4,6 +4,8 @@ namespace ClickAndMortar\ImportBundle\Command;
 
 use ClickAndMortar\ImportBundle\ImportHelper\ImportHelperInterface;
 use ClickAndMortar\ImportBundle\Reader\AbstractReader;
+use ClickAndMortar\ImportBundle\Reader\Readers\CsvReader;
+
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -39,12 +41,17 @@ class ImportCommand extends ContainerAwareCommand
      */
     protected $importHelper = null;
 
+    public function __construct(CsvReader $reader)
+    {
+      $this->reader = $reader;
+      parent::__construct();
+    }
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('candm:import')
+        $this->setName('app:import')
              ->setDescription('Import file to create entities')
              ->addArgument('path', InputArgument::REQUIRED, 'File path (eg. "/home/user/my-data.csv")')
              ->addArgument(
@@ -73,19 +80,7 @@ class ImportCommand extends ContainerAwareCommand
             // Get reader by extension
             $fileExtension          = pathinfo($path, PATHINFO_EXTENSION);
             $fileExtensionFormatted = strtolower($fileExtension);
-            $readerDispatcher       = $container->get('clickandmortar.import_bundle.reader_dispatcher');
 
-            if ($readerDispatcher->hasReaderByType($fileExtensionFormatted)) {
-                $this->reader = $readerDispatcher->getReaderByType($fileExtensionFormatted);
-            } else {
-                $errorMessage = sprintf(
-                    'No reader exist for extension %s to read file %s',
-                    $fileExtension,
-                    $path
-                );
-
-                throw new InvalidArgumentException($errorMessage);
-            }
         } else {
             $errorMessage = sprintf(
                 'File %s does not exist',
@@ -143,7 +138,7 @@ class ImportCommand extends ContainerAwareCommand
         /** @var EntityManager $entityManager */
         $entityManager   = $container->get('doctrine')->getManager();
         $repository      = $entityManager->getRepository($entityConfiguration['repository']);
-        $uniqueKey       = $entityConfiguration['unique_key'];
+        $uniqueKey       = isset($entityConfiguration['unique_key']) ? $entityConfiguration['unique_key']: null;
         $mapping         = $entityConfiguration['mappings'];
         $entityClassname = $entityConfiguration['model'];
         $onlyUpdate      = $entityConfiguration['only_update'];
@@ -157,10 +152,14 @@ class ImportCommand extends ContainerAwareCommand
 
         // Create each entity
         foreach ($rows as $row) {
-            $criteria = array(
-                $uniqueKey => $row[$mapping[$uniqueKey]],
-            );
-            $entity   = $repository->findOneBy($criteria);
+            if ($uniqueKey) {
+                $criteria = array(
+                    $uniqueKey => trim($row[$mapping[$uniqueKey]]),
+                );
+                $entity   = $repository->findOneBy($criteria);
+            } else {
+                $entity = null;
+            }
             if (is_null($entity) && $onlyUpdate === false) {
                 $entity = new $entityClassname();
             }
@@ -172,7 +171,7 @@ class ImportCommand extends ContainerAwareCommand
                         'set%s',
                         ucfirst($entityPropertyKey)
                     );
-                    $entity->{$setter}($row[$filePropertyKey]);
+                    $entity->{$setter}(trim($row[$filePropertyKey]));
                 }
 
                 // Complete data if necessary
