@@ -1,35 +1,42 @@
-ImportBundle - Click And Mortar
-=============================
+# ImportBundle - C&M
 
-Import Bundle can be used to populate entities from flat files (.csv, .xml, etc.)
+> Import Bundle can be used to populate entities from flat files (.csv, .xml, etc.)
 
-1. Installation
-----------------------
+## Installation
 
-Add package your **`composer.json`** file:
-```javascript
-"require": {
-    ...
-    "clickandmortar/import-bundle": "^1.0"
-    ...
+### Download the Bundle
+
+```console
+$ composer require clickandmortar/import-bundle
+```
+
+### Enable the Bundle
+
+Enable the bundle by adding it to the list of registered bundles
+in the `app/AppKernel.php` file of your project:
+
+```php
+<?php
+// app/AppKernel.php
+
+// ...
+class AppKernel extends Kernel
+{
+    public function registerBundles()
+    {
+        $bundles = [
+            // ...
+            new ClickAndMortar\ImportBundle\ClickAndMortarImportBundle(),
+        ];
+
+        // ...
+    }
+
+    // ...
 }
 ```
 
-Launch `composer update` to add bundle to your project:
-```bash
-composer update clickandmortar/import-bundle
-```
-
-Add bundle in your **`app/AppKernel.php`** file:
-```php
-$bundles = array(
-            ...
-            new ClickAndMortar\ImportBundle\ClickAndMortarImportBundle(),
-        );
-```
-
-2. Configuration
-----------------------
+## Configuration
 
 Configure bundle with your own entities in your **app/config.yml** file. Example:
 ```yaml
@@ -60,8 +67,7 @@ You can define multiple imports for a single entity by simply changing the name 
 | only_update             | No        | false                                   | If true, only update existing entities by using unique_key                                                                                       |
 | import_helper_service   | No        | acme.demo.import_helper.my_import_helper| Extension point to complete classic mapping data on entity. Service must implements "ImportHelperInterface" interface                            |
 
-3. Usage
-----------------------
+## Usage
 
 Launch import of file with command:
 ```bash
@@ -74,8 +80,7 @@ php app/console candm:import /path/of/your/file/customers.csv customer_from_pim
 |-----------------------|--------------------------|
 | --delete-after-import | Delete file after import |
 
-4. Extension
-----------------------
+## Extension
 
 You can create your own reader to read other file types.
 
@@ -105,7 +110,7 @@ class MyCustomXmlReader extends AbstractReader
     {
         $data = array();
 
-        ...
+        // ...
 
         return $data;
     }
